@@ -1,11 +1,76 @@
-<html>
-	<head>
-		<title>VolRad-Renderer</title>
-	</head>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VolRad Renderer</title>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Top bar -->
+      <header class="topbar">
+        <a class="wordmark" href="#">
+          <span class="wordmark__dot"></span>VolRad<sup>PET</sup>
+        </a>
+        <div class="topbar__end">
+          <button id="load-test" class="btn btn--tonal">Load test PET</button>
+          <button id="load-dicom" class="btn btn--solid">Open DICOM folder</button>
+          <input type="file" id="dicom-input" webkitdirectory multiple hidden />
+        </div>
+      </header>
 
-	<body>
-		<div id="view" style="width: 100vw; height: 100vh;"></div>
-		<script type="module" src="/src/main.ts"></script>
-	</body>
+      <main class="watch">
+        <!-- Left: volume info + controls -->
+        <aside class="panel">
+          <div class="info">
+            <span class="info__avatar"></span>
+            <div class="info__body">
+              <h1 class="info__title">Volume</h1>
+              <p id="info" class="info__meta">No study loaded</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__head"><h2 class="card__title">Rendering</h2></div>
+
+            <div class="field">
+              <label for="colormap">Colour map</label>
+              <select id="colormap" class="select"></select>
+            </div>
+
+            <div class="field">
+              <label for="mode">Mode</label>
+              <select id="mode" class="select">
+              </select>
+            </div>
+
+            <div class="field field--inline">
+              <label for="shade">Shading</label>
+              <input type="checkbox" id="shade" class="switch" />
+            </div>
+
+            <div class="field">
+              <button id="reset-camera" class="btn btn--tonal">Reset camera</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__head">
+              <h2 class="card__title">Opacity</h2>
+              <p class="card__sub">drag to edit</p>
+            </div>
+            <div id="opacity-editor" class="tf"></div>
+          </div>
+        </aside>
+
+        <!-- Right: 3D view -->
+        <section class="stage">
+          <div class="viewport">
+            <div id="view"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
-

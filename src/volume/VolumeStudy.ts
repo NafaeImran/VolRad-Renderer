@@ -11,7 +11,7 @@
  *  - Each channel keeps its OWN geometry (PET is usually ~4mm voxels,
  *    CT ~1mm). We never force them onto one grid at read time; the renderer
  *    resamples only when it needs a fused view.
- *  - Geometry is in patient/world millimetres, so PET and CT from the same
+ *  - Geometry is in patient/world ````````````millimetres````````````, so PET and CT from the same
  *    PET/CT exam line up automatically if the reader fills it in correctly.
  */
 
