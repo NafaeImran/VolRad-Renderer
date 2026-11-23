@@ -1,0 +1,240 @@
+/* =========================================================
+   VolRad UI: light theme
+   ========================================================= */
+
+/* ---------- Tokens ---------- */
+:root {
+  /* Surfaces */
+  --bg:         #ffffff;
+  --surface-2:  #f2f2f2;   /* cards, tonal buttons */
+  --surface-3:  #e5e5e5;   /* hover, pressed */
+  --border:     #d3d3d3;
+
+  /* Text */
+  --text:       #0f0f0f;
+  --text-2:     #606060;   /* secondary */
+  --text-inv:   #ffffff;
+
+  /* Accents */
+  --link:       #065fd4;   /* focus ring */
+  --pet:        #f28c28;   /* PET orange */
+
+  /* Type */
+  --font: "Roboto", "Arial", sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+
+  /* Geometry */
+  --topbar-h: 56px;
+  --panel-w: 360px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  line-height: 1.43;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+/* ---------- App shell: top bar + main ---------- */
+.app {
+  display: grid;
+  grid-template-rows: var(--topbar-h) 1fr;
+  height: 100vh;
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px;
+  background: var(--bg);
+}
+.topbar__end { display: flex; align-items: center; gap: 8px; }
+
+.wordmark {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  color: var(--text);
+}
+.wordmark__dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #ffd08a, var(--pet) 45%, #5a1d00 100%);
+}
+.wordmark sup {
+  font-size: 10px; font-weight: 500; color: var(--text-2);
+  letter-spacing: 0; align-self: flex-start; margin-top: 2px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 18px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.1s var(--ease);
+}
+.btn--tonal { background: var(--surface-2); color: var(--text); }
+.btn--tonal:hover { background: var(--surface-3); }
+.btn--solid { background: var(--text); color: var(--text-inv); }
+.btn--solid:hover { background: #272727; }
+/* Inside grey cards, tonal buttons are white so they don't vanish */
+.card .btn--tonal { background: var(--bg); border: 1px solid var(--border); }
+.card .btn--tonal:hover { background: var(--surface-3); }
+
+/* ---------- Main layout: panel left, view right ---------- */
+.watch {
+  display: grid;
+  grid-template-columns: var(--panel-w) minmax(0, 1fr);
+  gap: 24px;
+  padding: 0 24px 24px;
+  min-height: 0;          /* lets children shrink inside the grid row */
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* ---------- Viewport (vtk.js renders into #view) ---------- */
+.viewport {
+  position: relative;
+  flex: 1;                /* fill the stage height */
+  min-height: 300px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: #000;
+}
+/* #view must have a real size: vtk.js sizes its canvas to this element */
+#view { position: absolute; inset: 0; }
+
+/* ---------- Volume info: top of the left panel ---------- */
+.info { display: flex; gap: 12px; padding: 4px 0 0; }
+.info__avatar {
+  width: 40px; height: 40px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 40% 40%, #ffd08a, var(--pet) 45%, #5a1d00 100%);
+}
+.info__body { flex: 1; min-width: 0; }
+.info__title {
+  margin: 0 0 2px;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  line-height: 1.4;
+}
+.info__meta {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ---------- Left panel ---------- */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.card {
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  padding: 12px 16px 16px;
+}
+.card__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.card__title { margin: 0; font-size: var(--fs-md); font-weight: 500; }
+.card__sub { margin: 0; font-size: var(--fs-xs); color: var(--text-2); }
+
+/* Label above control */
+.field { display: grid; gap: 6px; padding: 10px 0; }
+.field + .field { border-top: 1px solid var(--surface-3); }
+.field label { font-size: var(--fs-sm); }
+/* Label and control on one line */
+.field--inline { display: flex; align-items: center; justify-content: space-between; }
+
+/* ---------- Select ---------- */
+.select {
+  width: 100%; height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+.select:hover { border-color: #b5b5b5; }
+
+/* ---------- Toggle switch (styled checkbox) ---------- */
+.switch {
+  appearance: none; -webkit-appearance: none;
+  position: relative;
+  width: 36px; height: 20px;
+  margin: 0;
+  border-radius: 10px;
+  background: #ccc;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease);
+}
+.switch::after {
+  content: "";
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s var(--ease);
+}
+.switch:checked { background: var(--text); }
+.switch:checked::after { transform: translateX(16px); }
+
+/* ---------- Opacity editor box (Step 7 widget goes inside) ---------- */
+.tf {
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  overflow: hidden;
+  min-height: 150px;
+}
+/* Don't stretch the widget's canvas with CSS: it would blur and
+   break mouse positions. The widget sets its own size. */
+.tf canvas { display: block; }
+
+/* ---------- Narrow screens: view on top, panel under it ---------- */
+@media (max-width: 1000px) {
+  .app { height: auto; min-height: 100vh; }
+  .watch { grid-template-columns: minmax(0, 1fr); }
+  .stage { order: -1; }
+  .viewport { flex: none; aspect-ratio: 4 / 3; }
+  .topbar { padding: 0 12px; }
+  .topbar .btn { padding: 0 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}

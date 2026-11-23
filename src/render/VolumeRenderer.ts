@@ -6,11 +6,15 @@ import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
 import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
 import type vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData';
+import { BlendMode } from '@kitware/vtk.js/Rendering/Core/VolumeMapper/Constants';
+
+
 import type { VolumeStudy } from '../volume/VolumeStudy';
 import { toImageData } from './toImageData';
 
 
-import { PET_PRESETS, applySpec } from './transferFunctions';
+
+import { COLOR_MAPS, defaultOpacity, applyColor, applyOpacity } from './transferFunctions';
 
 
 export class VolumeRenderer {
@@ -22,7 +26,7 @@ export class VolumeRenderer {
     private opacityTransferFunction?: vtkPiecewiseFunction;
     private imageData?: vtkImageData;
     private study?: VolumeStudy;
-
+    private currentCmap?: string;
 
     constructor(container: HTMLElement) { 
         this.grw = vtkGenericRenderWindow.newInstance({
@@ -39,7 +43,7 @@ export class VolumeRenderer {
         this.volume.setMapper(this.mapper);
         this.colorTransferFunction = vtkColorTransferFunction.newInstance();
         this.opacityTransferFunction = vtkPiecewiseFunction.newInstance();
-
+        this.currentCmap = COLOR_MAPS[0].name;
         const prop = this.volume.getProperty();
         prop.setRGBTransferFunction(0, this.colorTransferFunction);
         prop.setScalarOpacity(0, this.opacityTransferFunction);
@@ -69,13 +73,21 @@ export class VolumeRenderer {
 
 
         const [low, high] = study.pet.range;
-        this.applyPreset(PET_PRESETS[0].name, false);
-
-
+        applyColor(COLOR_MAPS[0].build([low, high]), this.colorTransferFunction!);
+        applyOpacity(defaultOpacity([low, high]), this.opacityTransferFunction!);
         this.resetCamera();
     }
 
 
+    getColorTransferFunction(): vtkColorTransferFunction | undefined {
+        return this.colorTransferFunction;
+    }
+
+    getOpacityTransferFunction(): vtkPiecewiseFunction | undefined {
+        return this.opacityTransferFunction;
+    }
+
+    
     getStudy(): VolumeStudy | undefined {
         return this.study;
     }
@@ -95,12 +107,44 @@ export class VolumeRenderer {
     }
 
     applyPreset(name: string, rerender = true): void {
-        const preset = PET_PRESETS.find((p) => p.name === name);
-        if (preset) {
-            applySpec(preset.build(this.study?.pet.range || [0, 1]), this.colorTransferFunction!, this.opacityTransferFunction!);
+        const cmap = COLOR_MAPS.find((p) => p.name === name);
+        if (cmap) {
+            applyColor(cmap.build(this.study?.pet.range || [0, 1]), this.colorTransferFunction!);
+            applyOpacity(defaultOpacity(this.study?.pet.range || [0, 1]), this.opacityTransferFunction!);
         }
         if (rerender) this.render();
     }
+
+
+    setColorMap(name: string): void {
+        this.currentCmap = name;
+
+        const cmap = COLOR_MAPS.find((p) => p.name === name);
+        if (cmap) {
+            applyColor(cmap.build(this.study?.pet.range || [0, 1]), this.colorTransferFunction!);
+        }
+    }
+
+    setRenderMode(mode: 'MIP' | 'Composite', rerender = true): void {
+        const renderer = this.grw.getRenderer();
+        switch (mode) {
+            case 'MIP':
+                this.mapper.setBlendMode(BlendMode.MAXIMUM_INTENSITY_BLEND);
+                break;
+            case 'Composite':
+                this.mapper.setBlendMode(BlendMode.COMPOSITE_BLEND);
+                break;
+        }
+        if (rerender) this.render();
+    }
+
+    setShading(enabled: boolean, rerender = true): void {
+        const prop = this.volume.getProperty();
+        prop.setShade(enabled);
+        if (rerender) this.render();
+    }
+
+
 }
 
 
